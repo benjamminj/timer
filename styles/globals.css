@@ -20,6 +20,9 @@
 
   /* BORDER-RADIUS */
   --border-radius-m: 1rem;
+
+  /* COLORS */
+  --primary-500: rebeccapurple;
 }
 
 html,
@@ -39,6 +42,16 @@ button {
   background: none;
   border: none;
   padding: 0;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p {
+  margin: 0;
 }
 
 * {

@@ -1,18 +1,23 @@
+import { GetServerSideProps, NextPage } from "next";
 import Head from "next/head";
-import { useEffect, useState } from "react";
-import { HOUR, MINUTE, SECOND } from "../lib/constants";
+import { useRouter } from "next/router";
+import { useEffect, useReducer, useState } from "react";
+import { Button } from "../components/Button";
+import { HOUR, SECOND } from "../lib/constants";
 import { formatTime } from "../lib/formatTime";
 import styles from "../styles/Home.module.css";
+import Link from "next/link";
 
-const mockMs = HOUR * 2 + MINUTE * 3 + SECOND * 7 + 78;
-const mockMsShort = MINUTE + 1000;
+type Status = "idle" | "running" | "paused" | "finished";
 
-type Status = "idle" | "running" | "paused";
+type HomePageProps = {
+  ms: number;
+};
 
-const Home = () => {
+const Home = ({ ms }: HomePageProps) => {
   const [status, setStatus] = useState<Status>("idle");
 
-  const [time, setTime] = useState(mockMs);
+  const [time, setTime] = useState(ms);
   const { hours, minutes, seconds } = formatTime(time);
 
   useEffect(() => {
@@ -26,6 +31,12 @@ const Home = () => {
       window.clearInterval(interval);
     };
   }, [status]);
+
+  useEffect(() => {
+    if (time === 0 && status === "running") {
+      setStatus("finished");
+    }
+  }, [time, status]);
 
   return (
     <div className={styles.container}>
@@ -41,30 +52,69 @@ const Home = () => {
             .join(":")}
         </p>
 
-        {status !== "running" && (
-          <button
-            className={styles.button}
+        {status === "finished" && (
+          <span className={styles.finishedText}>Tada! 🔥</span>
+        )}
+
+        {status === "paused" && (
+          <Button
             onClick={() => {
               setStatus("running");
             }}
           >
-            {status === "paused" ? "Resume" : "Start"}
-          </button>
+            Resume
+          </Button>
+        )}
+
+        {status === "idle" && (
+          <Button
+            onClick={() => {
+              setStatus("running");
+            }}
+          >
+            Start
+          </Button>
         )}
 
         {status === "running" && (
-          <button
-            className={styles.button}
+          <Button
             onClick={() => {
               setStatus("paused");
             }}
           >
             Pause
-          </button>
+          </Button>
         )}
+
+        {status !== "idle" && (
+          <Button
+            onClick={() => {
+              setTime(ms);
+              setStatus("idle");
+            }}
+          >
+            Reset
+          </Button>
+        )}
+
+        <Link href="/new" passHref>
+          <Button className={styles.createNew}>Create</Button>
+        </Link>
       </main>
     </div>
   );
+};
+
+export const getServerSideProps: GetServerSideProps<HomePageProps> = async (
+  ctx
+) => {
+  const { ms } = ctx.query as { ms: string };
+  const duration = parseInt(ms, 10);
+  return {
+    props: {
+      ms: isNaN(duration) ? 0 : duration,
+    },
+  };
 };
 
 export default Home;
