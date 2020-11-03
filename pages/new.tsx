@@ -25,10 +25,29 @@ const NewTimerPage = () => {
           const minutesInMs = Number(minutes) * MINUTE;
           const secondsInMs = Number(minutes) * SECOND;
 
-          router.push({
-            pathname: "/",
-            query: { ms: hoursInMs + minutesInMs + secondsInMs },
-          });
+          window
+            .fetch("/api/timers", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({
+                duration: hoursInMs + minutesInMs + secondsInMs,
+              }),
+            })
+            .then((res) => {
+              if (res.status !== 201) {
+                throw new Error("😱");
+              }
+
+              return res.json();
+            })
+            .then((res) => {
+              const { id } = res.data;
+              router.push({ pathname: `/timers/${id}` });
+
+              // TODO: handle error
+            });
         }}
       >
         <div className={styles.inputContainer}>
