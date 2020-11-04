@@ -23,7 +23,10 @@ const timersController: NextApiHandler = async (req, res) => {
         return res.status(201).json({ data: newTimer });
       }
       default:
-        return res.status(405).json({ message: "Method not allowed" });
+        res.setHeader("Allow", ["GET", "POST"]);
+        return res
+          .status(405)
+          .json({ message: `Method ${req.method} not allowed` });
     }
   } catch (error) {
     handleServerErrors(error, res);
