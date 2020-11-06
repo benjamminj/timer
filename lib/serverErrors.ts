@@ -1,7 +1,12 @@
 import { NextApiResponse } from "next";
 import { ZodError } from "zod";
 
-export class NotFoundError extends Error {
+export class HttpError extends Error {
+  readonly status: number;
+  readonly name: string;
+}
+
+export class NotFoundError extends HttpError {
   readonly status = 404;
   readonly name = "NotFoundError";
 }
@@ -12,7 +17,7 @@ export const handleServerErrors = (error: unknown, res: NextApiResponse) => {
     return res.status(400).json(error);
   }
 
-  if (error instanceof NotFoundError) {
+  if (error instanceof HttpError) {
     return res.status(error.status).json({ message: error.message });
   }
 
