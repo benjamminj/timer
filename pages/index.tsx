@@ -18,7 +18,7 @@ const Home = ({ ms }: HomePageProps) => {
   const [status, setStatus] = useState<Status>("idle");
 
   const [time, setTime] = useState(ms);
-  const { hours, minutes, seconds } = formatTime(time);
+  const formattedTime = formatTime(time);
 
   useEffect(() => {
     const interval = window.setInterval(() => {
@@ -46,11 +46,7 @@ const Home = ({ ms }: HomePageProps) => {
       </Head>
 
       <main className={styles.main}>
-        <p className={styles.timer}>
-          {[hours, minutes, seconds]
-            .map((value) => String(value).padStart(2, "0"))
-            .join(":")}
-        </p>
+        <p className={styles.timer}>{formattedTime}</p>
 
         {status === "finished" && (
           <span className={styles.finishedText}>Tada! 🔥</span>

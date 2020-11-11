@@ -1,13 +1,6 @@
 import { HOUR, MINUTE, SECOND } from "./constants";
 
-type Time = {
-  hours: number;
-  minutes: number;
-  seconds: number;
-};
-
-export const formatTime = (milliseconds: number): Time => {
-  // get the hours
+export const formatTime = (milliseconds: number): string => {
   const hours = Math.floor(milliseconds / HOUR);
   const hoursRemainder = milliseconds % HOUR;
 
@@ -16,5 +9,7 @@ export const formatTime = (milliseconds: number): Time => {
 
   const seconds = Math.floor(minutesRemainder / SECOND);
 
-  return { hours, minutes, seconds };
+  return [hours, minutes, seconds]
+    .map((value) => String(value).padStart(2, "0"))
+    .join(":");
 };

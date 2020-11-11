@@ -14,11 +14,33 @@ type HomePageProps = {
   ms: number;
 };
 
+const Header = () => {
+  return (
+    <header>
+      <Link href="/timers">
+        <a>Back</a>
+      </Link>
+
+      <style jsx>{`
+        header {
+          display: flex;
+          width: 100%;
+          padding: var(--size-m);
+        }
+
+        a {
+          font-size: var(--font-size-h6);
+        }
+      `}</style>
+    </header>
+  );
+};
+
 const Home = ({ ms }: HomePageProps) => {
   const [status, setStatus] = useState<Status>("idle");
 
   const [time, setTime] = useState(ms);
-  const { hours, minutes, seconds } = formatTime(time);
+  const formattedTime = formatTime(time);
 
   useEffect(() => {
     const interval = window.setInterval(() => {
@@ -45,12 +67,9 @@ const Home = ({ ms }: HomePageProps) => {
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
+      <Header />
       <main className={styles.main}>
-        <p className={styles.timer}>
-          {[hours, minutes, seconds]
-            .map((value) => String(value).padStart(2, "0"))
-            .join(":")}
-        </p>
+        <p className={styles.timer}>{formattedTime}</p>
 
         {status === "finished" && (
           <span className={styles.finishedText}>Tada! 🔥</span>
@@ -120,7 +139,10 @@ export const getServerSideProps: GetServerSideProps<HomePageProps> = async (
     ctx.res.setHeader("location", "/new");
     ctx.res.statusCode = 302;
     ctx.res.end();
-    return;
+
+    return {
+      props: { ms: 0 },
+    };
   }
 
   return {
