@@ -23,8 +23,9 @@ const NewTimerPage = () => {
 
           const hoursInMs = Number(hours) * HOUR;
           const minutesInMs = Number(minutes) * MINUTE;
-          const secondsInMs = Number(minutes) * SECOND;
+          const secondsInMs = Number(seconds) * SECOND;
 
+          console.log("SECONDS >>", secondsInMs);
           window
             .fetch("/api/timers", {
               method: "POST",

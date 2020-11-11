@@ -6,6 +6,7 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
+    "e2e": "yarn cypress open",
     "migrate:up": "yarn prisma migrate save --name init --experimental && prisma migrate up --experimental && yarn prisma:generate",
     "prisma:generate": "yarn prisma generate"
   },
