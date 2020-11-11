@@ -1,36 +1,35 @@
 import { NextApiHandler } from "next";
-import { PrismaClient, Timer } from "@prisma/client";
+import { TimerCreateInput } from "@prisma/client";
+import * as z from "zod";
+import { TimerService } from "../../../lib/timer.service";
+import { handleServerErrors } from "../../../lib/serverErrors";
 
-const prisma = new PrismaClient();
+type CreateTimerDto = Pick<TimerCreateInput, "duration" | "name">;
+const createTimerDto = z.object({
+  duration: z.number().positive(),
+  name: z.string().optional().nullable(),
+});
 
 const timersController: NextApiHandler = async (req, res) => {
   try {
-    if (req.method === "GET") {
-      const allTimers = await prisma.timer.findMany();
-      res.status(200).json({ data: allTimers });
+    switch (req.method) {
+      case "GET": {
+        const allTimers = await TimerService.findMany();
+        return res.status(200).json({ data: allTimers });
+      }
+      case "POST": {
+        const body: CreateTimerDto = createTimerDto.parse(req.body);
+        const newTimer = await TimerService.create(body);
+        return res.status(201).json({ data: newTimer });
+      }
+      default:
+        res.setHeader("Allow", ["GET", "POST"]);
+        return res
+          .status(405)
+          .json({ message: `Method ${req.method} not allowed` });
     }
-
-    if (req.method === "POST") {
-      // take the parameters from the req
-      const { duration, name } = req.body as Pick<Timer, "duration" | "name">;
-
-      // TODO: validate POST body is properly formatted
-
-      // create timer in the database
-      const newTimer = await prisma.timer.create({
-        data: {
-          duration,
-          name,
-        },
-      });
-
-      res.status(201).json({ data: newTimer });
-    }
-
-    // TODO: 405 method not allowed if any other method
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: "Internal server error" });
+    handleServerErrors(error, res);
   }
 };
 

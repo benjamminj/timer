@@ -11,6 +11,7 @@ generator client {
 }
 
 model Timer {
+  /// This will be part of the JSDoc?
   id          Int       @default(autoincrement()) @id
   createdAt   DateTime  @default(now())
   duration    Int

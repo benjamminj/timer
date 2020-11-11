@@ -1,69 +1,47 @@
 import { NextApiHandler } from "next";
-import { PrismaClient, Timer } from "@prisma/client";
+import { Timer } from "@prisma/client";
+import * as z from "zod";
+import { handleServerErrors } from "../../../lib/serverErrors";
+import { TimerService } from "../../../lib/timer.service";
 
-const prisma = new PrismaClient();
+const querySchema = z.object({
+  id: z.number().int(),
+});
+
+type UpdateTimerDto = Partial<Pick<Timer, "duration" | "name">>;
+const updateTimerDto = z.object({
+  duration: z.number().optional(),
+  name: z.string().optional().nullable(),
+});
 
 const timerController: NextApiHandler = async (req, res) => {
   try {
     const { id: rawId } = req.query as { id: string };
-    const id = Number(rawId);
+    const { id } = querySchema.parse({ id: Number(rawId) });
 
-    // TODO: standardize req validation
-    const isIdAnInteger = id % Math.floor(id) === 0;
-
-    if (isNaN(id) || !isIdAnInteger) {
-      return res
-        .status(400)
-        .json({ message: "Parameter 'id' must be an integer" });
-    }
-
-    if (req.method === "GET") {
-      const timer = await prisma.timer.findOne({
-        where: {
-          id,
-        },
-      });
-
-      if (timer === null) {
-        return res
-          .status(404)
-          .json({ message: "A timer with that id doesn't exist 😱" });
+    switch (req.method) {
+      case "GET": {
+        const timer = await TimerService.findOne(id);
+        return res.status(200).json({ data: timer });
       }
-
-      return res.status(200).json({ data: timer });
-    }
-
-    if (req.method === "PATCH") {
-      // pull out the req body
-      const body = req.body as Partial<Pick<Timer, "duration" | "name">>;
-
-      const updatedTimer = await prisma.timer.update({
-        where: {
-          id,
-        },
-        data: body,
-      });
-
-      // return the updated resource
-      res.status(200).json({ data: updatedTimer });
-    }
-
-    // DELETE request
-    if (req.method === "DELETE") {
-      const timerCount = await prisma.timer.count({ where: { id } });
-
-      if (timerCount === 0) {
-        return res
-          .status(404)
-          .json({ message: "A timer with that id doesn't exist 😱" });
+      case "PATCH": {
+        const body: UpdateTimerDto = updateTimerDto.parse(req.body);
+        const updatedTimer = await TimerService.update(id, body);
+        return res.status(200).json({ data: updatedTimer });
       }
-
-      const deletedTimer = await prisma.timer.delete({ where: { id } });
-      return res.status(200).json({ data: deletedTimer });
+      case "DELETE": {
+        const deletedTimer = await TimerService.delete(id);
+        return res.status(200).json({ data: deletedTimer });
+      }
+      default: {
+        res.setHeader("Allow", ["GET", "PATCH", "DELETE"]);
+        return res
+          .status(405)
+          .json({ message: `Method ${req.method} not allowed` });
+      }
     }
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: "Internal server error" });
+    return handleServerErrors(error, res);
   }
 };
 
