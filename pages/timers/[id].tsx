@@ -6,8 +6,6 @@ import { Button } from "../../components/Button";
 import { SECOND } from "../../lib/constants";
 import { formatTime } from "../../lib/formatTime";
 
-import styles from "../../styles/Home.module.css";
-
 type Status = "idle" | "running" | "paused" | "finished";
 
 type HomePageProps = {
@@ -16,22 +14,10 @@ type HomePageProps = {
 
 const Header = () => {
   return (
-    <header>
+    <header className="flex w-full p-4">
       <Link href="/timers">
-        <a>Back</a>
+        <a className="text-xl">Back</a>
       </Link>
-
-      <style jsx>{`
-        header {
-          display: flex;
-          width: 100%;
-          padding: var(--size-m);
-        }
-
-        a {
-          font-size: var(--font-size-h6);
-        }
-      `}</style>
     </header>
   );
 };
@@ -61,63 +47,67 @@ const Home = ({ ms }: HomePageProps) => {
   }, [time, status]);
 
   return (
-    <div className={styles.container}>
+    <div className="min-h-screen py-0 px-2 flex flex-col justify-center items-center">
       <Head>
         <title>Create Next App</title>
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
       <Header />
-      <main className={styles.main}>
-        <p className={styles.timer}>{formattedTime}</p>
+      <main className="flex-grow py-8 px-0 flex flex-col justify-center items-center">
+        <p className="text-6xl tabular-nums pb-8">{formattedTime}</p>
 
         {status === "finished" && (
-          <span className={styles.finishedText}>Tada! 🔥</span>
+          <span className="text-4xl pb-8">Tada! 🔥</span>
         )}
 
-        {status === "paused" && (
-          <Button
-            onClick={() => {
-              setStatus("running");
-            }}
-          >
-            Resume
-          </Button>
-        )}
+        <div className="space-y-4">
+          {status === "paused" && (
+            <Button
+              onClick={() => {
+                setStatus("running");
+              }}
+            >
+              Resume
+            </Button>
+          )}
 
-        {status === "idle" && (
-          <Button
-            onClick={() => {
-              setStatus("running");
-            }}
-          >
-            Start
-          </Button>
-        )}
+          {status === "idle" && (
+            <Button
+              onClick={() => {
+                setStatus("running");
+              }}
+            >
+              Start
+            </Button>
+          )}
 
-        {status === "running" && (
-          <Button
-            onClick={() => {
-              setStatus("paused");
-            }}
-          >
-            Pause
-          </Button>
-        )}
+          {status === "running" && (
+            <Button
+              onClick={() => {
+                setStatus("paused");
+              }}
+            >
+              Pause
+            </Button>
+          )}
 
-        {status !== "idle" && (
-          <Button
-            onClick={() => {
-              setTime(ms);
-              setStatus("idle");
-            }}
-          >
-            Reset
-          </Button>
-        )}
+          {status !== "idle" && (
+            <Button
+              onClick={() => {
+                setTime(ms);
+                setStatus("idle");
+              }}
+            >
+              Reset
+            </Button>
+          )}
+        </div>
 
         <Link href="/new" passHref>
-          <Button className={styles.createNew}>Create</Button>
+          <div className="fixed bottom-6 right-6">
+            <Button>Create</Button>
+          </div>
         </Link>
       </main>
     </div>

@@ -8,37 +8,30 @@ type ButtonProps = DetailedHTMLProps<
 export const Button = ({
   children,
   type = "button",
+  // eslint-disable-next-line
+  className,
+  disabled,
   ...props
 }: ButtonProps) => {
+  if (disabled) {
+    return (
+      <button
+        className="w-full text-8 py-4 px-8 rounded-2xl text-gray-500 border-gray-400 border-2  bg-gray-200 cursor-not-allowed"
+        type={type}
+        disabled
+        {...props}
+      >
+        {children}
+      </button>
+    );
+  }
   return (
-    <button type={type} {...props}>
+    <button
+      className="w-full text-xl text-gray-900 py-4 px-8 rounded-2xl border-gray-900 border-2 hover:bg-gray-900 hover:text-white focus:shadow-outline focus:outline-none disabled:bg-gray-600"
+      type={type}
+      {...props}
+    >
       {children}
-      <style jsx>
-        {`
-          button {
-            font-size: var(--font-size-h4);
-            padding: var(--size-m) var(--size-xl);
-            border-radius: var(--border-radius-m);
-            border: 2px solid black;
-          }
-
-          button:disabled {
-            border-color: #555;
-            background: #eee;
-            color: #777;
-            cursor: not-allowed;
-          }
-
-          button:hover {
-            cursor: pointer;
-          }
-
-          button:focus {
-            outline: none;
-            box-shadow: 0 0 0 2px rebeccapurple;
-          }
-        `}
-      </style>
     </button>
   );
 };

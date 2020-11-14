@@ -3,21 +3,17 @@ import { useRouter } from "next/router";
 import { Button } from "../components/Button";
 import { Input } from "../components/Input";
 import { HOUR, MINUTE, SECOND } from "../lib/constants";
-import styles from "../styles/New.module.css";
-
-type FormStatus = "incomplete" | "submitting" | "completed";
 
 const NewTimerPage = () => {
-  const [status, setStatus] = useState<FormStatus>("incomplete");
   const [hours, setHours] = useState("");
   const [minutes, setMinutes] = useState("");
   const [seconds, setSeconds] = useState("");
   const router = useRouter();
   return (
-    <div className={styles.newTimerContainer}>
-      <h1 className={styles.header}>Create a new timer</h1>
+    <div className="max-w-lg p-8 my-0 mx-auto">
+      <h1 className="text-4xl">Create a new timer</h1>
       <form
-        className={styles.form}
+        className="pt-6"
         onSubmit={(ev) => {
           ev.preventDefault();
 
@@ -25,7 +21,6 @@ const NewTimerPage = () => {
           const minutesInMs = Number(minutes) * MINUTE;
           const secondsInMs = Number(seconds) * SECOND;
 
-          console.log("SECONDS >>", secondsInMs);
           window
             .fetch("/api/timers", {
               method: "POST",
@@ -51,7 +46,7 @@ const NewTimerPage = () => {
             });
         }}
       >
-        <div className={styles.inputContainer}>
+        <div className="flex flex-col">
           <Input
             onChange={(ev) => {
               setHours(ev.target.value);
@@ -77,9 +72,9 @@ const NewTimerPage = () => {
             label="Seconds"
           />
 
-          <Button type="submit" className={styles.submit}>
-            Create
-          </Button>
+          <div className="mt-4">
+            <Button type="submit">Create</Button>
+          </div>
         </div>
       </form>
     </div>
