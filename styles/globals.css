@@ -40,7 +40,7 @@ a {
 
 button {
   background: none;
-  border: none;
+  border-width: 0;
   padding: 0;
 }
 
