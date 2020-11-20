@@ -1,36 +1,42 @@
 import { Timer } from "@prisma/client";
 import { GetServerSideProps } from "next";
 import Link from "next/link";
+import { ChevronRightIcon } from "../../components/ChevronRightIcon";
+import { NewTimerButton } from "../../components/NewTimerButton";
 import { formatTime } from "../../lib/formatTime";
+import { getRandomColor } from "../../lib/getRandomColor";
 
 interface TimersListPageProps {
   timers: Timer[];
 }
 
 const TimerPreview = ({ timer }: { timer: Timer }) => {
+  const color = getRandomColor();
   return (
-    <>
-      <Link href={`/timers/${timer.id}`}>
-        <a className="block text-3xl py-8 px-4 border-gray-400 border-2 rounded-2xl focus:shadow-outline focus:outline-none">
-          {timer.name || formatTime(timer.duration)}
-        </a>
-      </Link>
-    </>
+    <Link href={`/timers/${timer.id}`}>
+      <a
+        className={`block text-3xl py-8 px-4 focus:shadow-outline focus:outline-none bg-${color}-50 text-${color}-900 flex justify-between border-b-2 border-${color}-200`}
+      >
+        {timer.name || formatTime(timer.duration)}
+
+        <ChevronRightIcon className="h-8 w-8" />
+      </a>
+    </Link>
   );
 };
 
 const TimersListPage = ({ timers }: TimersListPageProps) => {
   return (
-    <div className="p-4 pt-8">
-      <h1 className="text-5xl">All timers</h1>
-
-      <ul className="space-y-4 mt-8">
+    <div>
+      <ul>
         {timers.map((timer) => (
           <li key={timer.id}>
             <TimerPreview timer={timer} />
           </li>
         ))}
       </ul>
+
+      <NewTimerButton />
     </div>
   );
 };

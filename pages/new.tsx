@@ -73,7 +73,9 @@ const NewTimerPage = () => {
           />
 
           <div className="mt-4">
-            <Button type="submit">Create</Button>
+            <Button type="submit" disabled>
+              Create
+            </Button>
           </div>
         </div>
       </form>

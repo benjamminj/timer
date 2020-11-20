@@ -1,3 +1,6 @@
+/* eslint-disable @typescript-eslint/no-var-requires */
+const plugin = require("tailwindcss/plugin");
+
 module.exports = {
   future: {
     removeDeprecatedGapUtilities: true,
@@ -16,7 +19,19 @@ module.exports = {
       },
     },
   },
-  // TODO: look into disabled pseudoclass on border colors
-  variants: {},
-  plugins: [],
+  variants: {
+    backgroundColor: ["responsive", "hover", "focus", "disabled"],
+    borderColor: ["responsive", "hover", "focus", "disabled"],
+    textColor: ["responsive", "hover", "focus", "disabled"],
+    cursor: ["responsive", "hover", "focus", "disabled"],
+  },
+  plugins: [
+    plugin(function ({ addVariant, e }) {
+      addVariant("disabled", ({ modifySelectors, separator }) => {
+        modifySelectors(({ className }) => {
+          return `.${e(`disabled${separator}${className}`)}:disabled`;
+        });
+      });
+    }),
+  ],
 };
